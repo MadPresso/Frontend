@@ -1,35 +1,20 @@
 <template>
-  <div>
+  <div id="app">
 
     <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
+      <div class="navbar-brand centered">
         <b-icon icon="coffee" size="is-large" />
-
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
+        <h3 class="title is-3 centered">MadPresso</h3>
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu">
+      <div id="navbar" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item">
-            Home
-          </a>
-          <a class="navbar-item">
-            Documentation
-          </a>
         </div>
       </div>
     </nav>
 
-    <div class="columns">
-      <div class="column"/>
-      <div class="column">
-        <Settings/>
-      </div>
-      <div class="column"/>
+    <div class="container main is-max-desktop">
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -37,10 +22,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Settings from './components/Settings.vue';
+import Status from './components/Status.vue';
 
 @Component({
   components: {
     Settings,
+    Status,
   },
 })
 export default class App extends Vue {}
@@ -52,7 +39,22 @@ export default class App extends Vue {}
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  /* color: #16b81e;
+  margin-top: 60px; */
 }
+
+.centered {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.main {
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  max-width: 600px;
+}
+
 </style>

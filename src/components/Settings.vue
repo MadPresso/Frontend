@@ -1,5 +1,6 @@
 <template>
-  <div class="">
+  <div class="container">
+    <b-loading is-full-page v-model="isLoading" :can-cancel="false"></b-loading>
 
     <b-notification
       auto-close
@@ -92,13 +93,21 @@
       </b-field>
     </section>
 
+    <section>
+      <b-button size="is-large"
+                type="is-primary"
+                icon-left="check"
+                @click="applyConfig()">
+                Apply
+      </b-button>
+    </section>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-export class Config {
+export class FirmwareConfig {
   brewTemperature!: number;
   steamTemperature: number;
 
@@ -118,48 +127,76 @@ export class Config {
   pidD: number;
 
   constructor() {
-    this.brewTemperature = 100;
-    this.steamTemperature = 140.0;
+    this.brewTemperature = NaN;
+    this.steamTemperature = NaN;
 
     this.shotTimerEnabled = false;
-    this.shotTimerSeconds = 100;
+    this.shotTimerSeconds = NaN;
 
     this.preInfusionEnabled = false;
-    this.preInfusionSeconds = 2;
+    this.preInfusionSeconds = NaN;
 
     this.pumpControlEnabled = true;
-    this.pumpControlPercentageStart = 100;
-    this.pumpControlPercentageEnd = 100;
-    this.pumpControlSeconds = 100;
+    this.pumpControlPercentageStart = NaN;
+    this.pumpControlPercentageEnd = NaN;
+    this.pumpControlSeconds = NaN;
 
-    this.pidP = 1;
-    this.pidI = 2;
-    this.pidD = 3;
+    this.pidP = NaN;
+    this.pidI = NaN;
+    this.pidD = NaN;
   }
 }
 
 @Component
 export default class Settings extends Vue {
-  timer!: number
-
   syncSuccessNotification: boolean;
   syncErrorNotification: boolean;
+  isLoading: boolean;
 
-  config: Config = new Config();
-  @Watch('config', { deep: true })
-  onPropertyChanged() {
-    clearInterval(this.timer);
-    this.timer = setInterval(() => {
-      console.log("TIMER FIRE " + JSON.stringify(this.config))
-      clearInterval(this.timer);
-      this.syncErrorNotification = true;
-    },1000);
-  }
+  config: FirmwareConfig = new FirmwareConfig();
 
   constructor() {
     super();
     this.syncSuccessNotification = false;
-    this.syncErrorNotification = "";
+    this.syncErrorNotification = false;
+    this.isLoading = true;
+    this.load();
+  }
+
+  load() {
+    Vue.axios.get("/api/v1/config").then((response) => {
+      this.config.brewTemperature = response.data['brewTemperature'];
+      this.config.steamTemperature = response.data['steamTemperature'];
+
+      this.config.shotTimerEnabled = response.data['shotTimerEnabled'];
+      this.config.shotTimerSeconds = response.data['shotTimerSeconds'];
+
+      this.config.preInfusionEnabled = response.data['preInfusionEnabled'];
+      this.config.preInfusionSeconds = response.data['preInfusionSeconds'];
+
+      this.config.pumpControlEnabled = response.data['pumpControlEnabled'];
+      this.config.pumpControlPercentageStart = response.data['pumpControlPercentageStart'];
+      this.config.pumpControlPercentageEnd = response.data['pumpControlPercentageEnd'];
+      this.config.pumpControlSeconds = response.data['pumpControlSeconds'];
+
+      this.config.pidP = response.data['pidP'];
+      this.config.pidI = response.data['pidI'];
+      this.config.pidD = response.data['pidD'];
+
+      this.isLoading = false;
+
+      console.log("this.config.pumpControlEnabled ", this.config.pumpControlEnabled);
+    })
+  }
+
+  applyConfig() {
+    Vue.axios.post("/api/v1/config", this.config).then((response) => {
+      console.log(response);
+    }).catch((error) => {
+      console.log(error);
+    }).finally(() => {
+      this.$router.push('/');
+    })
   }
 }
 </script>
@@ -168,7 +205,5 @@ export default class Settings extends Vue {
 <style scoped>
   section {
     margin-bottom: 50px;
-    padding-left: 20px;
-    padding-right: 20px;
   }
 </style>
