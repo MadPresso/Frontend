@@ -2,26 +2,6 @@
   <div class="container">
     <b-loading is-full-page v-model="isLoading" :can-cancel="false"></b-loading>
 
-    <b-notification
-      auto-close
-      type="is-success"
-      v-model="syncSuccessNotification"
-      has-icon
-      role="alert"
-      aria-close-label="Close notification">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce id fermentum quam. Proin sagittis, nibh id hendrerit imperdiet, elit sapien laoreet elit
-    </b-notification>
-
-    <b-notification
-      auto-close
-      type="is-danger"
-      v-model="syncErrorNotification"
-      has-icon
-      role="alert"
-      aria-close-label="Close notification">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce id fermentum quam. Proin sagittis, nibh id hendrerit imperdiet, elit sapien laoreet elit
-    </b-notification>
-
     <section>
       <h1 class="title">Temperature Settings</h1>
       <b-field label="Brew Temperature (°C)">
@@ -74,8 +54,14 @@
       </b-field>
 
       <div :hidden="!config.preInfusionEnabled">
-        <b-field label="Duration (seconds)">
-          <b-numberinput v-model="config.preInfusionSeconds" min="1" max="10" />
+        <b-field>
+          <b-checkbox v-model="config.preInfusionValveClosed">Close valve during pre-infusion</b-checkbox>
+        </b-field>
+        <b-field label="Pump Duration (seconds)">
+          <b-numberinput v-model="config.preInfusionPumpSeconds" min="1" max="10" />
+        </b-field>
+        <b-field label="Pause Duration (seconds)">
+          <b-numberinput v-model="config.preInfusionPauseSeconds" min="1" max="10" />
         </b-field>
       </div>
     </section>
@@ -91,14 +77,26 @@
       <b-field label="Differential Coefficient (D)">
         <b-numberinput v-model="config.pidD" />
       </b-field>
+      <b-field label="Integral windup limit factor">
+        <b-numberinput v-model="config.pidIntegralWindupLimit" />
+      </b-field>
+      <b-field label="Heater power during shots (percent)">
+        <b-numberinput v-model="config.heaterPercentageDuringShot" />
+      </b-field>
     </section>
 
     <section>
       <b-button size="is-large"
                 type="is-primary"
                 icon-left="check"
-                @click="applyConfig()">
+                @click="save()">
                 Apply
+      </b-button>
+      <b-button size="is-large"
+                type="is-primary"
+                icon-left="close"
+                @click="cancel()">
+                Cancel
       </b-button>
     </section>
   </div>
@@ -108,14 +106,16 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 export class FirmwareConfig {
-  brewTemperature!: number;
+  brewTemperature: number;
   steamTemperature: number;
 
   shotTimerEnabled: boolean;
   shotTimerSeconds: number;
 
   preInfusionEnabled: boolean;
-  preInfusionSeconds: number;
+  preInfusionValveClosed: boolean;
+  preInfusionPumpSeconds: number;
+  preInfusionPauseSeconds: number;
 
   pumpControlEnabled: boolean;
   pumpControlPercentageStart: number;
@@ -125,6 +125,8 @@ export class FirmwareConfig {
   pidP: number;
   pidI: number;
   pidD: number;
+  pidIntegralWindupLimit: number;
+  heaterPercentageDuringShot: number;
 
   constructor() {
     this.brewTemperature = NaN;
@@ -134,9 +136,11 @@ export class FirmwareConfig {
     this.shotTimerSeconds = NaN;
 
     this.preInfusionEnabled = false;
-    this.preInfusionSeconds = NaN;
+    this.preInfusionValveClosed = true;
+    this.preInfusionPumpSeconds = NaN;
+    this.preInfusionPauseSeconds = NaN;
 
-    this.pumpControlEnabled = true;
+    this.pumpControlEnabled = false;
     this.pumpControlPercentageStart = NaN;
     this.pumpControlPercentageEnd = NaN;
     this.pumpControlSeconds = NaN;
@@ -144,27 +148,25 @@ export class FirmwareConfig {
     this.pidP = NaN;
     this.pidI = NaN;
     this.pidD = NaN;
+    this.pidIntegralWindupLimit = NaN;
+    this.heaterPercentageDuringShot = 0;
   }
 }
 
 @Component
-export default class Settings extends Vue {
-  syncSuccessNotification: boolean;
-  syncErrorNotification: boolean;
+export default class MachineConfig extends Vue {
   isLoading: boolean;
 
   config: FirmwareConfig = new FirmwareConfig();
 
   constructor() {
     super();
-    this.syncSuccessNotification = false;
-    this.syncErrorNotification = false;
     this.isLoading = true;
     this.load();
   }
 
   load() {
-    Vue.axios.get("/api/v1/config").then((response) => {
+    Vue.axios.get("/api/v1/config/machine").then((response) => {
       this.config.brewTemperature = response.data['brewTemperature'];
       this.config.steamTemperature = response.data['steamTemperature'];
 
@@ -172,7 +174,9 @@ export default class Settings extends Vue {
       this.config.shotTimerSeconds = response.data['shotTimerSeconds'];
 
       this.config.preInfusionEnabled = response.data['preInfusionEnabled'];
-      this.config.preInfusionSeconds = response.data['preInfusionSeconds'];
+      this.config.preInfusionValveClosed = response.data['preInfusionValveClosed'];
+      this.config.preInfusionPumpSeconds = response.data['preInfusionPumpSeconds'];
+      this.config.preInfusionPauseSeconds = response.data['preInfusionPauseSeconds'];
 
       this.config.pumpControlEnabled = response.data['pumpControlEnabled'];
       this.config.pumpControlPercentageStart = response.data['pumpControlPercentageStart'];
@@ -182,21 +186,25 @@ export default class Settings extends Vue {
       this.config.pidP = response.data['pidP'];
       this.config.pidI = response.data['pidI'];
       this.config.pidD = response.data['pidD'];
+      this.config.pidIntegralWindupLimit = response.data['pidIntegralWindupLimit'];
+      this.config.heaterPercentageDuringShot = response.data['heaterPercentageDuringShot'];
 
       this.isLoading = false;
-
-      console.log("this.config.pumpControlEnabled ", this.config.pumpControlEnabled);
     })
   }
 
-  applyConfig() {
-    Vue.axios.post("/api/v1/config", this.config).then((response) => {
+  save() {
+    Vue.axios.post("/api/v1/config/machine", this.config).then((response) => {
       console.log(response);
     }).catch((error) => {
       console.log(error);
     }).finally(() => {
       this.$router.push('/');
     })
+  }
+
+  cancel() {
+      this.$router.push('/');
   }
 }
 </script>
@@ -205,5 +213,9 @@ export default class Settings extends Vue {
 <style scoped>
   section {
     margin-bottom: 50px;
+  }
+
+  button {
+    margin-right: 10px;;
   }
 </style>

@@ -5,34 +5,20 @@ import VueRouter from 'vue-router'
 import App from './App.vue'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
-import '@fortawesome/fontawesome-svg-core/styles.css'
 import './assets/bulmaswatch.min.css'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCheck, faCheckCircle, faInfoCircle, faExclamationTriangle, faExclamationCircle,
-  faArrowUp, faAngleRight, faAngleLeft, faAngleDown,
-  faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload, faHome, faMinus, faPlus, faCoffee, faCogs } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faCheck, faCheckCircle, faInfoCircle, faExclamationTriangle, faExclamationCircle,
-  faArrowUp, faAngleRight, faAngleLeft, faAngleDown,
-  faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload,
-  faHome, faMinus, faPlus, faCoffee, faCogs )
 
 Vue.config.productionTip = false
 
-Vue.component('vue-fontawesome', FontAwesomeIcon);
+Vue.use(Buefy)
 
-Vue.use(Buefy, {
-  defaultIconComponent: 'vue-fontawesome',
-  defaultIconPack: 'fas',
-})
-
-import Settings from './components/Settings.vue';
+import MachineConfig from './components/MachineConfig.vue';
 import Status from './components/Status.vue';
+import NetworkConfig from './components/NetworkConfig.vue';
 
 const routes = [
   { path: '/', component: Status },
-  { path: '/settings', component: Settings }
+  { path: '/settings/machine', component: MachineConfig },
+  { path: '/settings/network', component: NetworkConfig }
 ]
 
 const router = new VueRouter({

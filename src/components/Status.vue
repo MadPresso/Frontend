@@ -22,9 +22,17 @@
     <section>
       <b-button size="is-large"
                 type="is-primary"
-                icon-left="cogs"
-                @click="navigateToSettings()">
+                icon-left="cog"
+                @click="navigateToMachineConfig()">
                 Settings
+      </b-button>
+    </section>
+    <section>
+      <b-button size="is-large"
+                type="is-primary"
+                icon-left="wifi-cog"
+                @click="navigateToNetworkConfig()">
+                Wifi
       </b-button>
     </section>
   </div>
@@ -34,9 +42,9 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 export class FirmwareStatus {
-  temperature!: number;
-  targetTemperature!: number;
-  heaterPowerPercentage!: number;
+  temperature: number;
+  targetTemperature: number;
+  heaterPowerPercentage: number;
 
   constructor() {
     this.temperature = -Infinity;
@@ -58,7 +66,6 @@ export default class Status extends Vue {
 
   load() {
     Vue.axios.get("/api/v1/status").then((response) => {
-      console.log(response.data);
       this.status.temperature = response.data['temperature'];
       this.status.targetTemperature = response.data['targetTemperature'];
       this.status.heaterPowerPercentage = response.data['heaterPowerPercentage'];
@@ -79,8 +86,12 @@ export default class Status extends Vue {
     clearInterval(this.timer);
   }
 
-  navigateToSettings() {
-    this.$router.push('/settings');
+  navigateToMachineConfig() {
+    this.$router.push('/settings/machine');
+  }
+
+  navigateToNetworkConfig() {
+    this.$router.push('/settings/network');
   }
 }
 </script>
