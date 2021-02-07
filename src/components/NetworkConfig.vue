@@ -27,7 +27,7 @@
           focusable>
         <b-table-column field="ssid" label="SSID" v-slot="props">
           {{ props.row.ssid }}
-          <b-tag v-if="props.row.ssid == networkConfig.staSSID"
+          <b-tag v-if="props.row.ssid == networkConfig.staSSID && networkConfig.mode == 'STA'"
             rounded>
             connected
           </b-tag>
