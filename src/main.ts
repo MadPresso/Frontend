@@ -17,8 +17,8 @@ import NetworkConfig from './components/NetworkConfig.vue';
 
 const routes = [
   { path: '/', component: Status },
-  { path: '/settings/machine', component: MachineConfig },
-  { path: '/settings/network', component: NetworkConfig }
+  { path: '/config/machine', component: MachineConfig },
+  { path: '/config/network', component: NetworkConfig }
 ]
 
 const router = new VueRouter({

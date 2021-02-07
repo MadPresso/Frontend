@@ -87,16 +87,15 @@ export default class Status extends Vue {
   }
 
   navigateToMachineConfig() {
-    this.$router.push('/settings/machine');
+    this.$router.push('/config/machine');
   }
 
   navigateToNetworkConfig() {
-    this.$router.push('/settings/network');
+    this.$router.push('/config/network');
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   section {
     margin-bottom: 30px;
