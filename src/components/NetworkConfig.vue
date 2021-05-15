@@ -38,7 +38,7 @@
           <b-icon :icon="iconForRssi(props.row.rssi)"  />
         </b-table-column>
       </b-table>
-      <b-button icon-left="sync" size="is-small" type="is-primay is-light" @click="scan()" :disabled="isScanning">Scan</b-button>
+      <b-button icon-left="sync" size="is-small" type="is-primay" @click="scan()" :disabled="isScanning">Scan</b-button>
     </section>
     <section v-else-if="networkConfig.mode == 'AP'">
       <span class="is-1">
@@ -114,7 +114,7 @@ export default class NetworkConfig extends Vue {
     this.scan();
   }
 
-  sortWifis() {
+  sortWifis() : void {
     this.scannedWifis = this.scannedWifis.sort((left, right): number => {
       if (left.rssi > right.rssi)
         return -1;
@@ -145,7 +145,7 @@ export default class NetworkConfig extends Vue {
     return "signal-cellular-1";
   }
 
-  load() {
+  load() : void {
     this.isLoading = true;
 
     Vue.axios.get("/api/v1/config/network").then((response) => {
@@ -159,7 +159,7 @@ export default class NetworkConfig extends Vue {
     })
   }
 
-  save() {
+  save() : void {
     console.log(JSON.stringify(this.networkConfig));
     Vue.axios.post("/api/v1/config/network", this.networkConfig).then((response) => {
       console.log(response);
@@ -170,7 +170,7 @@ export default class NetworkConfig extends Vue {
     })
   }
 
-  scan() {
+  scan() : void {
     this.isScanning = true;
     this.scannedWifis = [];
 
@@ -191,7 +191,7 @@ export default class NetworkConfig extends Vue {
     })
   }
 
-  applyConfig() {
+  applyConfig() : void {
     if (this.networkConfig.mode == 'STA') {
       if (this.selectedWifi.encrypted) {
         this.$buefy.dialog.prompt({
@@ -224,7 +224,7 @@ export default class NetworkConfig extends Vue {
     }
   }
 
-  cancel() {
+  cancel() : void {
       this.$router.push('/');
   }
 }

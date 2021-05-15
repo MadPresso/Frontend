@@ -15,6 +15,7 @@ import {
   mdiSignalCellular1,
   mdiSignalCellular2,
   mdiSignalCellular3,
+  mdiSync,
   mdiWifi,
   mdiAccessPoint,
 } from '@mdi/js';
@@ -31,6 +32,7 @@ const icons = {
   "signal-cellular-1": mdiSignalCellular1,
   "signal-cellular-2": mdiSignalCellular2,
   "signal-cellular-3": mdiSignalCellular3,
+  "sync": mdiSync,
   "wifi": mdiWifi,
   "access-point": mdiAccessPoint,
 };
