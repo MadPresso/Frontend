@@ -64,7 +64,7 @@ export default class Status extends Vue {
     this.isLoading = true;
   }
 
-  load() {
+  load() : void {
     Vue.axios.get("/api/v1/status").then((response) => {
       this.status.temperature = response.data['temperature'];
       this.status.targetTemperature = response.data['targetTemperature'];
@@ -76,21 +76,21 @@ export default class Status extends Vue {
     })
   }
 
-  mounted() {
+  mounted(): void {
     this.timer = setInterval(() => {
       this.load();
     }, 1000)
   }
 
-  destroyed() {
+  destroyed(): void {
     clearInterval(this.timer);
   }
 
-  navigateToMachineConfig() {
+  navigateToMachineConfig(): void {
     this.$router.push('/config/machine');
   }
 
-  navigateToNetworkConfig() {
+  navigateToNetworkConfig(): void {
     this.$router.push('/config/network');
   }
 }
