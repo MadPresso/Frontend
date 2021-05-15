@@ -13,6 +13,7 @@ rm -rf dist
 npm run build
 
 find dist -type f -name *legacy* | xargs -r rm
+find dist -type f -name *map* | xargs -r rm
 find dist -type f | xargs -rn 1 gzip
 
 rm -rf $dest/webroot
