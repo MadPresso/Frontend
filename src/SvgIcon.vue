@@ -52,6 +52,11 @@ export default {
 </script>
 
 <style lang="css">
+  .icon {
+    vertical-align: middle;
+    height: 1rem;
+  }
+
   .icon svg {
     fill: none !important;
   }
